@@ -4,8 +4,8 @@
     "description": "База даних Адреси - Студенти",
     "main": "main.js",
     "scripts": {
-        "start": "electron .",
-        "dev": "electron . --dev"
+        "start": "chcp 65001 > nul && electron .",
+        "dev": "chcp 65001 > nul && electron . --dev"
     },
     "keywords": [
         "electron",

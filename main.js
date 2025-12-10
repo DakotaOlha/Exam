@@ -1,3 +1,4 @@
+process.env.LANG = "uk_UA.UTF-8";
 // main.js - Головний файл Electron
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
@@ -6,17 +7,29 @@ const sql = require("mssql");
 // Вимкнути апаратне прискорення для усунення помилок GPU
 app.disableHardwareAcceleration();
 
-// Налаштування підключення до бази даних
-// Конфігурація для WINDOWS-AHD9VN5\SQLEXPRESS
-
+// Налаштування підключення до бази даних з SQL Server Authentication
 const dbConfig = {
-    server: "WINDOWS-AHD9VN5\\SQLEXPRESS",
+    server: "localhost",
     database: "Adresses",
-    driver: "msnodesqlv8",
+    user: "ElectronUser",
+    password: "SecurePass123!",
+    port: 1433, // Явно вказуємо порт
     options: {
-        trustedConnection: true,
         enableArithAbort: true,
         trustServerCertificate: true,
+        encrypt: false,
+        instanceName: "SQLEXPRESS",
+        // Додаємо підтримку українських символів
+        useUTC: false,
+        charset: "UTF-8",
+        collation: "Cyrillic_General_CI_AS",
+    },
+    // Важливо для правильного відображення кирилиці
+    requestTimeout: 30000,
+    pool: {
+        max: 10,
+        min: 0,
+        idleTimeoutMillis: 30000,
     },
 };
 
@@ -62,6 +75,7 @@ ipcMain.handle("get-streets", async () => {
         console.log("Спроба підключення до БД з конфігурацією:", {
             server: dbConfig.server,
             database: dbConfig.database,
+            user: dbConfig.user,
         });
         const pool = await sql.connect(dbConfig);
         console.log("Підключення успішне!");
