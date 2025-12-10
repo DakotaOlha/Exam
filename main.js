@@ -2,6 +2,10 @@ process.env.LANG = "uk_UA.UTF-8";
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const sql = require("mssql");
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const os = require("os");
+const ExcelJS = require("exceljs");
 
 app.disableHardwareAcceleration();
 
@@ -11,18 +15,16 @@ const dbConfig = {
     database: "Adresses",
     user: "ElectronUser",
     password: "SecurePass123!",
-    port: 1433, // Явно вказуємо порт
+    port: 1433,
     options: {
         enableArithAbort: true,
         trustServerCertificate: true,
         encrypt: false,
         instanceName: "SQLEXPRESS",
-        // Додаємо підтримку українських символів
         useUTC: false,
         charset: "UTF-8",
         collation: "Cyrillic_General_CI_AS",
     },
-    // Важливо для правильного відображення кирилиці
     requestTimeout: 30000,
     pool: {
         max: 10,
@@ -278,6 +280,207 @@ ipcMain.handle("get-students-report", async (event, streetName) => {
         await pool.close();
         return { success: true, data: result.recordset };
     } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+
+// Генерація PDF звіту
+ipcMain.handle("generate-pdf-report", async () => {
+    try {
+        const pool = await sql.connect(dbConfig);
+
+        // Отримуємо всі дані студентів згруповані за вулицями
+        const result = await pool.request().query(`
+            SELECT 
+                s.NameStreet,
+                h.HouseNumber,
+                a.ApartmentNumber,
+                st.FullName,
+                st.DateOfBirth,
+                st.Gender,
+                st.Comments
+            FROM Students st
+            JOIN Apartments a ON st.ApartmentID = a.ApartmentID
+            JOIN Houses h ON a.HouseID = h.HouseID
+            JOIN Streets s ON h.StreetID = s.StreetID
+            ORDER BY s.NameStreet, h.HouseNumber, a.ApartmentNumber
+        `);
+
+        await pool.close();
+
+        const students = result.recordset;
+
+        // Групуємо студентів за вулицями
+        const streetGroups = {};
+        students.forEach((student) => {
+            if (!streetGroups[student.NameStreet]) {
+                streetGroups[student.NameStreet] = [];
+            }
+            streetGroups[student.NameStreet].push(student);
+        });
+
+        // Створюємо PDF
+        const doc = new PDFDocument({
+            size: "A4",
+            margins: { top: 50, bottom: 50, left: 50, right: 50 },
+        });
+
+        // Шлях до файлу
+        const desktopPath = path.join(os.homedir(), "Desktop");
+        const fileName = `Zvit_Studenty_${new Date().toISOString().split("T")[0]}.pdf`;
+        const filePath = path.join(desktopPath, fileName);
+
+        const stream = fs.createWriteStream(filePath);
+        doc.pipe(stream);
+
+        // Реєструємо шрифт для підтримки кирилиці
+        const fontPath = path.join(__dirname, "fonts", "DejaVuSans.ttf");
+        const fontBoldPath = path.join(__dirname, "fonts", "DejaVuSans-Bold.ttf");
+
+        // Перевіряємо чи є шрифти, якщо ні - використовуємо стандартні
+        let hasCustomFont = false;
+        try {
+            if (fs.existsSync(fontPath)) {
+                doc.registerFont("DejaVuSans", fontPath);
+                if (fs.existsSync(fontBoldPath)) {
+                    doc.registerFont("DejaVuSans-Bold", fontBoldPath);
+                }
+                hasCustomFont = true;
+            }
+        } catch (e) {
+            console.log("Використовуємо стандартні шрифти");
+        }
+
+        // Заголовок документа
+        doc.fontSize(20)
+            .font(hasCustomFont ? "DejaVuSans-Bold" : "Helvetica-Bold")
+            .text("Звіт про студентів за адресами", { align: "center" });
+
+        doc.fontSize(12)
+            .font(hasCustomFont ? "DejaVuSans" : "Helvetica")
+            .text(`Дата створення: ${new Date().toLocaleDateString("uk-UA")}`, { align: "center" });
+
+        doc.moveDown(2);
+
+        // Виводимо студентів по вулицях
+        Object.keys(streetGroups)
+            .sort()
+            .forEach((streetName, index) => {
+                const studentsOnStreet = streetGroups[streetName];
+
+                // Перевіряємо чи потрібна нова сторінка
+                if (doc.y > 650) {
+                    doc.addPage();
+                }
+
+                // Назва вулиці
+                doc.fontSize(16)
+                    .font(hasCustomFont ? "DejaVuSans-Bold" : "Helvetica-Bold")
+                    .fillColor("#667eea")
+                    .text(streetName, { underline: true });
+
+                doc.moveDown(0.5);
+                doc.fontSize(10)
+                    .font(hasCustomFont ? "DejaVuSans" : "Helvetica")
+                    .fillColor("#000000")
+                    .text(`Кількість студентів: ${studentsOnStreet.length}`);
+
+                doc.moveDown(0.5);
+
+                // Таблиця студентів
+                studentsOnStreet.forEach((student, idx) => {
+                    if (doc.y > 700) {
+                        doc.addPage();
+                    }
+
+                    const address = `${student.HouseNumber}, кв. ${student.ApartmentNumber}`;
+                    const dob = new Date(student.DateOfBirth).toLocaleDateString("uk-UA");
+
+                    doc.fontSize(9)
+                        .font(hasCustomFont ? "DejaVuSans-Bold" : "Helvetica-Bold")
+                        .text(`${idx + 1}. ${student.FullName}`, { continued: false });
+
+                    doc.fontSize(8)
+                        .font(hasCustomFont ? "DejaVuSans" : "Helvetica")
+                        .fillColor("#666666")
+                        .text(`   Адреса: ${address}`, { continued: true })
+                        .text(` | Дата народження: ${dob}`, { continued: true })
+                        .text(` | Стать: ${student.Gender}`);
+
+                    if (student.Comments) {
+                        doc.text(`   Коментар: ${student.Comments}`);
+                    }
+
+                    doc.fillColor("#000000");
+                    doc.moveDown(0.3);
+                });
+
+                doc.moveDown(1);
+
+                // Лінія-розділювач між вулицями
+                if (index < Object.keys(streetGroups).length - 1) {
+                    doc.strokeColor("#cccccc")
+                        .lineWidth(1)
+                        .moveTo(50, doc.y)
+                        .lineTo(545, doc.y)
+                        .stroke();
+                    doc.moveDown(1);
+                }
+            });
+
+        // Додаємо нову сторінку для статистики
+        doc.addPage();
+
+        // Статистика
+        doc.fontSize(18)
+            .font(hasCustomFont ? "DejaVuSans-Bold" : "Helvetica-Bold")
+            .fillColor("#667eea")
+            .text("Статистика", { align: "center" });
+
+        doc.moveDown(2);
+
+        // Загальна кількість
+        doc.fontSize(14)
+            .fillColor("#000000")
+            .text(`Загальна кількість студентів: ${students.length}`);
+
+        doc.moveDown(1);
+
+        // Таблиця по вулицях
+        doc.fontSize(12)
+            .font(hasCustomFont ? "DejaVuSans-Bold" : "Helvetica-Bold")
+            .text("Розподіл студентів за вулицями:");
+
+        doc.moveDown(0.5);
+
+        const sortedStreets = Object.keys(streetGroups).sort();
+        sortedStreets.forEach((streetName, idx) => {
+            const count = streetGroups[streetName].length;
+            const percentage = ((count / students.length) * 100).toFixed(1);
+
+            doc.fontSize(10)
+                .font(hasCustomFont ? "DejaVuSans" : "Helvetica")
+                .text(`${idx + 1}. ${streetName}: ${count} студентів (${percentage}%)`);
+
+            doc.moveDown(0.3);
+        });
+
+        // Завершуємо документ
+        doc.end();
+
+        // Чекаємо завершення запису
+        await new Promise((resolve, reject) => {
+            stream.on("finish", resolve);
+            stream.on("error", reject);
+        });
+
+        return {
+            success: true,
+            filePath: filePath,
+            fileName: fileName,
+        };
+    } catch (err) {
+        console.error("Помилка генерації PDF:", err);
         return { success: false, error: err.message };
     }
 });

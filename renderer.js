@@ -656,3 +656,53 @@ function renderReportTable(data) {
         )
         .join("");
 }
+
+// Генерація PDF звіту
+async function generatePdfReport() {
+    const resultDiv = document.getElementById("pdf-result");
+    resultDiv.innerHTML =
+        '<div class="message show" style="background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9;">⏳ Генерація PDF звіту...</div>';
+
+    const result = await window.db.generatePdfReport();
+
+    if (result.success) {
+        resultDiv.innerHTML = `
+            <div class="message success show">
+                ✅ PDF звіт успішно створено!<br>
+                <strong>Файл:</strong> ${result.fileName}<br>
+                <strong>Місце збереження:</strong> Робочий стіл
+            </div>
+        `;
+    } else {
+        resultDiv.innerHTML = `
+            <div class="message error show">
+                ❌ Помилка генерації PDF: ${result.error}
+            </div>
+        `;
+    }
+}
+
+// Генерація Excel звіту
+async function generateExcelReport() {
+    const resultDiv = document.getElementById("excel-result");
+    resultDiv.innerHTML =
+        '<div class="message show" style="background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9;">⏳ Генерація Excel звіту...</div>';
+
+    const result = await window.db.generateExcelReport();
+
+    if (result.success) {
+        resultDiv.innerHTML = `
+            <div class="message success show">
+                ✅ Excel звіт успішно створено!<br>
+                <strong>Файл:</strong> ${result.fileName}<br>
+                <strong>Місце збереження:</strong> Робочий стіл
+            </div>
+        `;
+    } else {
+        resultDiv.innerHTML = `
+            <div class="message error show">
+                ❌ Помилка генерації Excel: ${result.error}
+            </div>
+        `;
+    }
+}

@@ -13,4 +13,5 @@ contextBridge.exposeInMainWorld("db", {
     deleteStudent: (studentId) => ipcRenderer.invoke("delete-student", studentId),
     countHouses: (streetName) => ipcRenderer.invoke("count-houses", streetName),
     getStudentsReport: (streetName) => ipcRenderer.invoke("get-students-report", streetName),
+    generatePdfReport: () => ipcRenderer.invoke("generate-pdf-report"),
 });

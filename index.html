@@ -576,14 +576,22 @@
                     <h2>Звіти та статистика</h2>
 
                     <div class="report-section">
-                        <h3>Генерація PDF звіту</h3>
-                        <p style="color: #718096; margin-bottom: 10px">
-                            Створити повний звіт про всіх студентів за вулицями у форматі PDF
+                        <h3>Генерація звітів</h3>
+                        <p style="color: #718096; margin-bottom: 15px">
+                            Створити повний звіт про всіх студентів за вулицями у різних форматах
                         </p>
-                        <button class="btn btn-primary" onclick="generatePdfReport()">
+                        <button
+                            class="btn btn-primary"
+                            onclick="generatePdfReport()"
+                            style="margin-right: 10px"
+                        >
                             📄 Згенерувати PDF звіт
                         </button>
+                        <button class="btn btn-success" onclick="generateExcelReport()">
+                            📊 Згенерувати Excel звіт
+                        </button>
                         <div id="pdf-result" style="margin-top: 15px"></div>
+                        <div id="excel-result" style="margin-top: 15px"></div>
                     </div>
 
                     <div class="report-section">
