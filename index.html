@@ -1,552 +1,642 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>База даних "Адреси"</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>База даних "Адреси"</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            overflow: hidden;
-        }
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                height: 100vh;
+                overflow: hidden;
+            }
 
-        .container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
+            .container {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                padding: 20px;
+            }
 
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
+            .header {
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
 
-        .header h1 {
-            color: #667eea;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
+            .header h1 {
+                color: #667eea;
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
 
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
+            .nav-tabs {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
 
-        .tab-btn {
-            padding: 10px 20px;
-            border: none;
-            background: #f0f0f0;
-            color: #333;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
+            .tab-btn {
+                padding: 10px 20px;
+                border: none;
+                background: #f0f0f0;
+                color: #333;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.3s;
+            }
 
-        .tab-btn:hover {
-            background: #e0e0e0;
-        }
+            .tab-btn:hover {
+                background: #e0e0e0;
+            }
 
-        .tab-btn.active {
-            background: #667eea;
-            color: white;
-        }
+            .tab-btn.active {
+                background: #667eea;
+                color: white;
+            }
 
-        .content {
-            flex: 1;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            overflow-y: auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+            .content {
+                flex: 1;
+                background: white;
+                border-radius: 10px;
+                padding: 20px;
+                overflow-y: auto;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
-        .tab-content {
-            display: none;
-        }
+            .tab-content {
+                display: none;
+            }
 
-        .tab-content.active {
-            display: block;
-        }
+            .tab-content.active {
+                display: block;
+            }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+            .form-group {
+                margin-bottom: 15px;
+            }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 600;
+                color: #333;
+            }
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 14px;
+            }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+            .form-group textarea {
+                resize: vertical;
+                min-height: 80px;
+            }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            margin-right: 10px;
-        }
+            .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.3s;
+                margin-right: 10px;
+            }
 
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
+            .btn-primary {
+                background: #667eea;
+                color: white;
+            }
 
-        .btn-primary:hover {
-            background: #5568d3;
-        }
+            .btn-primary:hover {
+                background: #5568d3;
+            }
 
-        .btn-danger {
-            background: #f56565;
-            color: white;
-        }
+            .btn-danger {
+                background: #f56565;
+                color: white;
+            }
 
-        .btn-danger:hover {
-            background: #e53e3e;
-        }
+            .btn-danger:hover {
+                background: #e53e3e;
+            }
 
-        .btn-success {
-            background: #48bb78;
-            color: white;
-        }
+            .btn-success {
+                background: #48bb78;
+                color: white;
+            }
 
-        .btn-success:hover {
-            background: #38a169;
-        }
+            .btn-success:hover {
+                background: #38a169;
+            }
 
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
+            .table-container {
+                overflow-x: auto;
+                margin-top: 20px;
+            }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+            }
 
-        table th,
-        table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
+            table th,
+            table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
 
-        table th {
-            background: #f7fafc;
-            font-weight: 600;
-            color: #4a5568;
-        }
+            table th {
+                background: #f7fafc;
+                font-weight: 600;
+                color: #4a5568;
+            }
 
-        table tr:hover {
-            background: #f7fafc;
-        }
+            table tr:hover {
+                background: #f7fafc;
+            }
 
-        table tr.highlight {
-            background: #fef5e7 !important;
-            animation: highlightPulse 1s ease-in-out;
-        }
+            table tr.highlight {
+                background: #fef5e7 !important;
+                animation: highlightPulse 1s ease-in-out;
+            }
 
-        @keyframes highlightPulse {
-            0%, 100% { background: #fef5e7; }
-            50% { background: #ffeaa7; }
-        }
+            @keyframes highlightPulse {
+                0%,
+                100% {
+                    background: #fef5e7;
+                }
+                50% {
+                    background: #ffeaa7;
+                }
+            }
 
-        .search-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+            .search-container {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
 
-        .search-container input {
-            flex: 1;
-            min-width: 200px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+            .search-container input {
+                flex: 1;
+                min-width: 200px;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
 
-        .filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+            .filters {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
 
-        .filters select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            min-width: 200px;
-        }
+            .filters select {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                min-width: 200px;
+            }
 
-        .message {
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            display: none;
-        }
+            .filters input {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                min-width: 200px;
+                flex: 1;
+            }
 
-        .message.success {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
-        }
+            .message {
+                padding: 10px 15px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                display: none;
+            }
 
-        .message.error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
-        }
+            .message.success {
+                background: #c6f6d5;
+                color: #22543d;
+                border: 1px solid #9ae6b4;
+            }
 
-        .message.show {
-            display: block;
-        }
+            .message.error {
+                background: #fed7d7;
+                color: #742a2a;
+                border: 1px solid #fc8181;
+            }
 
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
+            .message.show {
+                display: block;
+            }
 
-        .form-row .form-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
+            .form-row {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
 
-        .report-section {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f7fafc;
-            border-radius: 5px;
-        }
+            .form-row .form-group {
+                flex: 1;
+                margin-bottom: 0;
+            }
 
-        .report-section h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
+            .report-section {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f7fafc;
+                border-radius: 5px;
+            }
 
-        .stat-card {
-            display: inline-block;
-            padding: 15px 25px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-right: 15px;
-            margin-bottom: 15px;
-        }
+            .report-section h3 {
+                color: #667eea;
+                margin-bottom: 10px;
+            }
 
-        .stat-card .number {
-            font-size: 32px;
-            font-weight: bold;
-            color: #667eea;
-        }
+            .stat-card {
+                display: inline-block;
+                padding: 15px 25px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin-right: 15px;
+                margin-bottom: 15px;
+            }
 
-        .stat-card .label {
-            color: #718096;
-            margin-top: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📚 База даних "Адреси"</h1>
-            <div class="nav-tabs">
-                <button class="tab-btn active" data-tab="students">Студенти</button>
-                <button class="tab-btn" data-tab="streets">Вулиці</button>
-                <button class="tab-btn" data-tab="houses">Будинки</button>
-                <button class="tab-btn" data-tab="apartments">Квартири</button>
-                <button class="tab-btn" data-tab="reports">Звіти</button>
-            </div>
-        </div>
+            .stat-card .number {
+                font-size: 32px;
+                font-weight: bold;
+                color: #667eea;
+            }
 
-        <div class="content">
-            <!-- Вкладка: Студенти -->
-            <div id="students" class="tab-content active">
-                <h2>Управління студентами</h2>
-                
-                <div class="message" id="students-message"></div>
-
-                <div class="filters">
-                    <select id="filter-street">
-                        <option value="">Всі вулиці</option>
-                    </select>
-                    <input type="text" id="search-student" placeholder="🔍 Пошук за ПІБ...">
-                    <button class="btn btn-primary" onclick="filterStudents()">Знайти</button>
-                    <button class="btn btn-success" onclick="showAddStudentForm()">+ Додати студента</button>
-                </div>
-
-                <div id="add-student-form" style="display: none; padding: 20px; background: #f7fafc; border-radius: 8px; margin-bottom: 20px;">
-                    <h3>Новий студент</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>ПІБ *</label>
-                            <input type="text" id="student-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Дата народження *</label>
-                            <input type="date" id="student-dob" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Стать *</label>
-                            <select id="student-gender" required>
-                                <option value="">Оберіть...</option>
-                                <option value="Чоловіча">Чоловіча</option>
-                                <option value="Жіноча">Жіноча</option>
-                                <option value="Інше">Інше</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Вулиця *</label>
-                            <select id="student-street" onchange="loadHousesForStudent()" required>
-                                <option value="">Оберіть вулицю...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Будинок *</label>
-                            <select id="student-house" onchange="loadApartmentsForStudent()" required>
-                                <option value="">Спочатку оберіть вулицю...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Квартира *</label>
-                            <select id="student-apartment" required>
-                                <option value="">Спочатку оберіть будинок...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Коментар</label>
-                        <textarea id="student-comments" placeholder="Староста, Відмінник, тощо..."></textarea>
-                    </div>
-                    <button class="btn btn-success" onclick="addStudent()">Зберегти</button>
-                    <button class="btn" onclick="hideAddStudentForm()">Скасувати</button>
-                </div>
-
-                <div class="table-container">
-                    <table id="students-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>ПІБ</th>
-                                <th>Дата народження</th>
-                                <th>Стать</th>
-                                <th>Адреса</th>
-                                <th>Коментар</th>
-                                <th>Дії</th>
-                            </tr>
-                        </thead>
-                        <tbody id="students-tbody">
-                            <tr><td colspan="7" style="text-align: center;">Завантаження...</td></tr>
-                        </tbody>
-                    </table>
+            .stat-card .label {
+                color: #718096;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>📚 База даних "Адреси"</h1>
+                <div class="nav-tabs">
+                    <button class="tab-btn active" data-tab="students">Студенти</button>
+                    <button class="tab-btn" data-tab="streets">Вулиці</button>
+                    <button class="tab-btn" data-tab="houses">Будинки</button>
+                    <button class="tab-btn" data-tab="apartments">Квартири</button>
+                    <button class="tab-btn" data-tab="reports">Звіти</button>
                 </div>
             </div>
 
-            <!-- Вкладка: Вулиці -->
-            <div id="streets" class="tab-content">
-                <h2>Управління вулицями</h2>
-                
-                <div class="message" id="streets-message"></div>
+            <div class="content">
+                <!-- Вкладка: Студенти -->
+                <div id="students" class="tab-content active">
+                    <h2>Управління студентами</h2>
 
-                <div class="form-group" style="max-width: 400px;">
-                    <label>Назва вулиці</label>
-                    <input type="text" id="new-street-name" placeholder="Введіть назву вулиці">
-                    <button class="btn btn-success" onclick="addStreet()" style="margin-top: 10px;">+ Додати вулицю</button>
-                </div>
+                    <div class="message" id="students-message"></div>
 
-                <div class="table-container">
-                    <table id="streets-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Назва вулиці</th>
-                            </tr>
-                        </thead>
-                        <tbody id="streets-tbody">
-                            <tr><td colspan="2" style="text-align: center;">Завантаження...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Вкладка: Будинки -->
-            <div id="houses" class="tab-content">
-                <h2>Управління будинками</h2>
-                
-                <div class="message" id="houses-message"></div>
-
-                <div style="max-width: 500px;">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Вулиця</label>
-                            <select id="house-street">
-                                <option value="">Оберіть вулицю...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Номер будинку</label>
-                            <input type="text" id="new-house-number" placeholder="10, 12А, 5">
-                        </div>
-                    </div>
-                    <button class="btn btn-success" onclick="addHouse()">+ Додати будинок</button>
-                </div>
-
-                <div class="filters" style="margin-top: 20px;">
-                    <select id="filter-house-street" onchange="filterHouses()">
-                        <option value="">Всі вулиці</option>
-                    </select>
-                </div>
-
-                <div class="table-container">
-                    <table id="houses-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Номер будинку</th>
-                                <th>Вулиця</th>
-                            </tr>
-                        </thead>
-                        <tbody id="houses-tbody">
-                            <tr><td colspan="3" style="text-align: center;">Завантаження...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Вкладка: Квартири -->
-            <div id="apartments" class="tab-content">
-                <h2>Управління квартирами</h2>
-                
-                <div class="message" id="apartments-message"></div>
-
-                <div style="max-width: 600px;">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Вулиця</label>
-                            <select id="apartment-street" onchange="loadHousesForApartment()">
-                                <option value="">Оберіть вулицю...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Будинок</label>
-                            <select id="apartment-house">
-                                <option value="">Спочатку оберіть вулицю...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Номер квартири</label>
-                            <input type="number" id="new-apartment-number" placeholder="5, 21, 101">
-                        </div>
-                    </div>
-                    <button class="btn btn-success" onclick="addApartment()">+ Додати квартиру</button>
-                </div>
-
-                <div class="filters" style="margin-top: 20px;">
-                    <select id="filter-apartment-street" onchange="loadHousesForFilter()">
-                        <option value="">Всі вулиці</option>
-                    </select>
-                    <select id="filter-apartment-house" onchange="filterApartments()">
-                        <option value="">Всі будинки</option>
-                    </select>
-                </div>
-
-                <div class="table-container">
-                    <table id="apartments-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Номер квартири</th>
-                                <th>Будинок</th>
-                                <th>Вулиця</th>
-                            </tr>
-                        </thead>
-                        <tbody id="apartments-tbody">
-                            <tr><td colspan="4" style="text-align: center;">Завантаження...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Вкладка: Звіти -->
-            <div id="reports" class="tab-content">
-                <h2>Звіти та статистика</h2>
-
-                <div class="report-section">
-                    <h3>Кількість будинків на вулиці</h3>
-                    <div class="form-group" style="max-width: 400px;">
-                        <input type="text" id="count-street-name" placeholder="Введіть назву вулиці">
-                        <button class="btn btn-primary" onclick="countHousesOnStreet()" style="margin-top: 10px;">Підрахувати</button>
-                    </div>
-                    <div id="house-count-result" style="margin-top: 15px;"></div>
-                </div>
-
-                <div class="report-section">
-                    <h3>Студенти за вулицею</h3>
                     <div class="filters">
-                        <select id="report-street" onchange="loadStudentsReport()">
+                        <select id="filter-street" onchange="filterStudents()">
                             <option value="">Всі вулиці</option>
                         </select>
+                        <input
+                            type="text"
+                            id="search-student"
+                            placeholder="🔍 Пошук за ПІБ..."
+                            oninput="filterStudents()"
+                        />
+                        <button class="btn btn-success" onclick="showAddStudentForm()">
+                            + Додати студента
+                        </button>
                     </div>
+
+                    <div
+                        id="add-student-form"
+                        style="
+                            display: none;
+                            padding: 20px;
+                            background: #f7fafc;
+                            border-radius: 8px;
+                            margin-bottom: 20px;
+                        "
+                    >
+                        <h3>Новий студент</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>ПІБ *</label>
+                                <input type="text" id="student-name" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Дата народження *</label>
+                                <input type="date" id="student-dob" required />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Стать *</label>
+                                <select id="student-gender" required>
+                                    <option value="">Оберіть...</option>
+                                    <option value="Чоловіча">Чоловіча</option>
+                                    <option value="Жіноча">Жіноча</option>
+                                    <option value="Інше">Інше</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Вулиця *</label>
+                                <select
+                                    id="student-street"
+                                    onchange="loadHousesForStudent()"
+                                    required
+                                >
+                                    <option value="">Оберіть вулицю...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Будинок *</label>
+                                <select
+                                    id="student-house"
+                                    onchange="loadApartmentsForStudent()"
+                                    required
+                                >
+                                    <option value="">Спочатку оберіть вулицю...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Квартира *</label>
+                                <select id="student-apartment" required>
+                                    <option value="">Спочатку оберіть будинок...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Коментар</label>
+                            <textarea
+                                id="student-comments"
+                                placeholder="Староста, Відмінник, тощо..."
+                            ></textarea>
+                        </div>
+                        <button class="btn btn-success" onclick="addStudent()">Зберегти</button>
+                        <button class="btn" onclick="hideAddStudentForm()">Скасувати</button>
+                    </div>
+
                     <div class="table-container">
-                        <table id="report-table">
+                        <table id="students-table">
                             <thead>
                                 <tr>
-                                    <th>Вулиця</th>
-                                    <th>Будинок</th>
-                                    <th>Квартира</th>
-                                    <th>ПІБ студента</th>
+                                    <th>ID</th>
+                                    <th>ПІБ</th>
                                     <th>Дата народження</th>
+                                    <th>Стать</th>
+                                    <th>Адреса</th>
+                                    <th>Коментар</th>
+                                    <th>Дії</th>
                                 </tr>
                             </thead>
-                            <tbody id="report-tbody">
-                                <tr><td colspan="5" style="text-align: center;">Завантаження...</td></tr>
+                            <tbody id="students-tbody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center">Завантаження...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
+                <!-- Вкладка: Вулиці -->
+                <div id="streets" class="tab-content">
+                    <h2>Управління вулицями</h2>
+
+                    <div class="message" id="streets-message"></div>
+
+                    <div class="form-group" style="max-width: 400px">
+                        <label>Назва вулиці</label>
+                        <input
+                            type="text"
+                            id="new-street-name"
+                            placeholder="Введіть назву вулиці"
+                        />
+                        <button
+                            class="btn btn-success"
+                            onclick="addStreet()"
+                            style="margin-top: 10px"
+                        >
+                            + Додати вулицю
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="streets-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Назва вулиці</th>
+                                </tr>
+                            </thead>
+                            <tbody id="streets-tbody">
+                                <tr>
+                                    <td colspan="2" style="text-align: center">Завантаження...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Вкладка: Будинки -->
+                <div id="houses" class="tab-content">
+                    <h2>Управління будинками</h2>
+
+                    <div class="message" id="houses-message"></div>
+
+                    <div style="max-width: 500px">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Вулиця</label>
+                                <select id="house-street">
+                                    <option value="">Оберіть вулицю...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Номер будинку</label>
+                                <input type="text" id="new-house-number" placeholder="10, 12А, 5" />
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="addHouse()">
+                            + Додати будинок
+                        </button>
+                    </div>
+
+                    <div class="filters" style="margin-top: 20px">
+                        <select id="filter-house-street" onchange="filterHouses()">
+                            <option value="">Всі вулиці</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="houses-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Номер будинку</th>
+                                    <th>Вулиця</th>
+                                </tr>
+                            </thead>
+                            <tbody id="houses-tbody">
+                                <tr>
+                                    <td colspan="3" style="text-align: center">Завантаження...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Вкладка: Квартири -->
+                <div id="apartments" class="tab-content">
+                    <h2>Управління квартирами</h2>
+
+                    <div class="message" id="apartments-message"></div>
+
+                    <div style="max-width: 600px">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Вулиця</label>
+                                <select id="apartment-street" onchange="loadHousesForApartment()">
+                                    <option value="">Оберіть вулицю...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Будинок</label>
+                                <select id="apartment-house">
+                                    <option value="">Спочатку оберіть вулицю...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Номер квартири</label>
+                                <input
+                                    type="number"
+                                    id="new-apartment-number"
+                                    placeholder="5, 21, 101"
+                                />
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="addApartment()">
+                            + Додати квартиру
+                        </button>
+                    </div>
+
+                    <div class="filters" style="margin-top: 20px">
+                        <select id="filter-apartment-street" onchange="loadHousesForFilter()">
+                            <option value="">Всі вулиці</option>
+                        </select>
+                        <select id="filter-apartment-house" onchange="filterApartments()">
+                            <option value="">Всі будинки</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="apartments-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Номер квартири</th>
+                                    <th>Будинок</th>
+                                    <th>Вулиця</th>
+                                </tr>
+                            </thead>
+                            <tbody id="apartments-tbody">
+                                <tr>
+                                    <td colspan="4" style="text-align: center">Завантаження...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Вкладка: Звіти -->
+                <div id="reports" class="tab-content">
+                    <h2>Звіти та статистика</h2>
+
+                    <div class="report-section">
+                        <h3>Генерація PDF звіту</h3>
+                        <p style="color: #718096; margin-bottom: 10px">
+                            Створити повний звіт про всіх студентів за вулицями у форматі PDF
+                        </p>
+                        <button class="btn btn-primary" onclick="generatePdfReport()">
+                            📄 Згенерувати PDF звіт
+                        </button>
+                        <div id="pdf-result" style="margin-top: 15px"></div>
+                    </div>
+
+                    <div class="report-section">
+                        <h3>Кількість будинків на вулиці</h3>
+                        <div class="form-group" style="max-width: 400px">
+                            <input
+                                type="text"
+                                id="count-street-name"
+                                placeholder="Введіть назву вулиці"
+                            />
+                            <button
+                                class="btn btn-primary"
+                                onclick="countHousesOnStreet()"
+                                style="margin-top: 10px"
+                            >
+                                Підрахувати
+                            </button>
+                        </div>
+                        <div id="house-count-result" style="margin-top: 15px"></div>
+                    </div>
+
+                    <div class="report-section">
+                        <h3>Студенти за вулицею</h3>
+                        <div class="filters">
+                            <select id="report-street" onchange="loadStudentsReport()">
+                                <option value="">Всі вулиці</option>
+                            </select>
+                        </div>
+                        <div class="table-container">
+                            <table id="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Вулиця</th>
+                                        <th>Будинок</th>
+                                        <th>Квартира</th>
+                                        <th>ПІБ студента</th>
+                                        <th>Дата народження</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-tbody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center">
+                                            Завантаження...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script src="renderer.js"></script>
-</body>
-</html> 
+        <script src="renderer.js"></script>
+    </body>
+</html>

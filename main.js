@@ -1,10 +1,8 @@
 process.env.LANG = "uk_UA.UTF-8";
-// main.js - Головний файл Electron
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const sql = require("mssql");
 
-// Вимкнути апаратне прискорення для усунення помилок GPU
 app.disableHardwareAcceleration();
 
 // Налаштування підключення до бази даних з SQL Server Authentication

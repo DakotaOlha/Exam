@@ -116,14 +116,51 @@ function renderStudentsTable() {
 }
 
 async function filterStudents() {
-    await loadStudents();
+    const streetId = document.getElementById("filter-street")?.value || null;
+    const searchText =
+        document.getElementById("search-student")?.value?.trim().toLowerCase() || null;
 
-    // Якщо є пошуковий текст, виділяємо найбільш підходящий результат
-    const searchText = document.getElementById("search-student").value;
-    if (searchText && students.length > 0) {
-        // Знаходимо найбільш релевантний результат (перший за алфавітом)
-        const bestMatch = students[0];
-        highlightRow(`student-row-${bestMatch.StudentID}`);
+    // Завантажуємо всіх студентів без фільтрації на сервері
+    const result = await window.db.getStudents({ streetId });
+
+    if (result.success) {
+        students = result.data;
+        renderStudentsTable();
+
+        // Якщо є пошуковий текст, знаходимо та виділяємо найкращий збіг
+        if (searchText && students.length > 0) {
+            // Шукаємо студента, чиє ім'я найкраще відповідає пошуковому запиту
+            let bestMatch = null;
+            let bestScore = -1;
+
+            students.forEach((student) => {
+                const fullName = student.FullName.toLowerCase();
+
+                // Точний збіг на початку імені має найвищий пріоритет
+                if (fullName.startsWith(searchText)) {
+                    const score = 1000 - fullName.length; // Коротші імена мають вищий пріоритет
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = student;
+                    }
+                }
+                // Збіг у будь-якому місці імені
+                else if (fullName.includes(searchText)) {
+                    const score = 500 - fullName.indexOf(searchText);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = student;
+                    }
+                }
+            });
+
+            // Якщо знайдено збіг, виділяємо його
+            if (bestMatch) {
+                highlightRow(`student-row-${bestMatch.StudentID}`);
+            }
+        }
+    } else {
+        showMessage("students-message", "Помилка завантаження студентів: " + result.error, false);
     }
 }
 
