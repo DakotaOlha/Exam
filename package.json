@@ -1,0 +1,23 @@
+{
+    "name": "adresses-app",
+    "version": "1.0.0",
+    "description": "База даних Адреси - Студенти",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "dev": "electron . --dev"
+    },
+    "keywords": [
+        "electron",
+        "database",
+        "students"
+    ],
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^27.0.0"
+    },
+    "dependencies": {
+        "mssql": "^10.0.1"
+    }
+}
